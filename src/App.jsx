@@ -2,9 +2,11 @@ import { useState } from 'react'
 import Inscription from './Inscription'
 import Dashboard from './Dashboard'
 import Annonces from './Annonces'
+import Connexion from './Connexion'
 
 function App() {
   const [page, setPage] = useState('accueil')
+  const [utilisateur, setUtilisateur] = useState(null)
 
   const categories = [
     {
@@ -66,6 +68,7 @@ function App() {
     { numero: '3', titre: 'Vendez au meilleur prix', description: 'Négociez directement sans intermédiaire et recevez votre paiement en toute sécurité.', emoji: '💰' },
   ]
 
+  if (page === 'connexion') return <Connexion onConnecte={(user) => { setUtilisateur(user); setPage('accueil') }} onRetour={() => setPage('accueil')} />
   if (page === 'inscription') return <Inscription onRetour={() => setPage('accueil')} />
   if (page === 'dashboard') return <Dashboard onRetour={() => setPage('accueil')} />
   if (page === 'annonces') return <Annonces onRetour={() => setPage('accueil')} />
@@ -75,11 +78,16 @@ function App() {
 
       <header style={{ background: '#1B5E20', padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h1 style={{ color: 'white', margin: 0, fontSize: '1.5rem' }}>🌿 GUINEA AGRI MARKET</h1>
-        <nav>
+        <nav style={{ display: 'flex', alignItems: 'center' }}>
           <a href="#" style={{ color: 'white', marginLeft: '1rem', textDecoration: 'none' }}>Accueil</a>
           <a href="#" onClick={() => setPage('annonces')} style={{ color: 'white', marginLeft: '1rem', textDecoration: 'none', cursor: 'pointer' }}>Produits</a>
           <a href="#" onClick={() => setPage('inscription')} style={{ color: 'white', marginLeft: '1rem', textDecoration: 'none', cursor: 'pointer' }}>Agriculteurs</a>
           <a href="#" onClick={() => setPage('dashboard')} style={{ color: '#A5D6A7', marginLeft: '1rem', textDecoration: 'none', cursor: 'pointer' }}>🔐 Admin</a>
+          {utilisateur ? (
+            <span style={{ color: '#A5D6A7', marginLeft: '1rem', fontSize: '0.9rem' }}>👤 {utilisateur.email}</span>
+          ) : (
+            <a href="#" onClick={() => setPage('connexion')} style={{ color: 'white', marginLeft: '1rem', textDecoration: 'none', cursor: 'pointer', background: '#2E7D32', padding: '0.3rem 0.8rem', borderRadius: '6px' }}>🔐 Connexion</a>
+          )}
         </nav>
       </header>
 
