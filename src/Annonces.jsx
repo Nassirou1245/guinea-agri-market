@@ -9,20 +9,13 @@ function Annonces({ onRetour }) {
   const [filtreCategorie, setFiltreCategorie] = useState('')
   const [filtreRegion, setFiltreRegion] = useState('')
   const [succes, setSucces] = useState(false)
+  const [photo, setPhoto] = useState(null)
+  const [photoPreview, setPhotoPreview] = useState(null)
 
   const [form, setForm] = useState({
-    produit: '',
-    categorie: '',
-    quantite: '',
-    unite: 'kg',
-    prix: '',
-    description: '',
-    region: '',
-    prefecture: '',
-    telephone: '',
-    whatsapp: '',
-    nom_vendeur: '',
-    type_vente: 'B2C',
+    produit: '', categorie: '', quantite: '', unite: 'kg',
+    prix: '', description: '', region: '', prefecture: '',
+    telephone: '', whatsapp: '', nom_vendeur: '', type_vente: 'B2C',
   })
 
   const produits = [
@@ -49,9 +42,7 @@ function Annonces({ onRetour }) {
     'Kankan', 'Faranah', "N'Zérékoré", 'Boké'
   ]
 
-  useEffect(() => {
-    chargerAnnonces()
-  }, [])
+  useEffect(() => { chargerAnnonces() }, [])
 
   const chargerAnnonces = async () => {
     setChargement(true)
@@ -68,10 +59,26 @@ function Annonces({ onRetour }) {
     setForm(prev => ({ ...prev, [name]: value }))
   }
 
+  const uploadPhoto = async (fichier) => {
+    const nomFichier = `${Date.now()}-${fichier.name}`
+    const { data, error } = await supabase.storage
+      .from('photos-annonces')
+      .upload(nomFichier, fichier)
+    if (error) return null
+    const { data: urlData } = supabase.storage
+      .from('photos-annonces')
+      .getPublicUrl(nomFichier)
+    return urlData.publicUrl
+  }
+
   const publierAnnonce = async () => {
     if (!form.produit || !form.quantite || !form.prix || !form.region || !form.telephone || !form.nom_vendeur) {
       alert('Veuillez remplir tous les champs obligatoires *')
       return
+    }
+    let photoUrl = null
+    if (photo) {
+      photoUrl = await uploadPhoto(photo)
     }
     const { error } = await supabase.from('annonces').insert([{
       produit: form.produit,
@@ -87,12 +94,15 @@ function Annonces({ onRetour }) {
       nom_vendeur: form.nom_vendeur,
       type_vente: form.type_vente,
       statut: 'Disponible',
+      photo_url: photoUrl,
     }])
     if (error) {
       alert('Erreur : ' + error.message)
     } else {
       setSucces(true)
       setAfficherFormulaire(false)
+      setPhoto(null)
+      setPhotoPreview(null)
       setForm({ produit: '', categorie: '', quantite: '', unite: 'kg', prix: '', description: '', region: '', prefecture: '', telephone: '', whatsapp: '', nom_vendeur: '', type_vente: 'B2C' })
       chargerAnnonces()
       setTimeout(() => setSucces(false), 3000)
@@ -197,6 +207,18 @@ function Annonces({ onRetour }) {
             <label style={label}>WhatsApp</label>
             <input style={input} name="whatsapp" value={form.whatsapp} onChange={handleChange} placeholder="Si différent du téléphone" />
 
+            <label style={label}>Photo du produit 📸</label>
+            {photoPreview && (
+              <img src={photoPreview} alt="Aperçu" style={{ width: '100%', borderRadius: '8px', marginTop: '0.5rem', maxHeight: '200px', objectFit: 'cover' }} />
+            )}
+            <input type="file" accept="image/*" onChange={(e) => {
+              const fichier = e.target.files[0]
+              if (fichier) {
+                setPhoto(fichier)
+                setPhotoPreview(URL.createObjectURL(fichier))
+              }
+            }} style={{ ...input, padding: '0.5rem' }} />
+
             <label style={label}>Description</label>
             <textarea style={{ ...input, minHeight: '80px', resize: 'vertical' }} name="description" value={form.description} onChange={handleChange} placeholder="Qualité, variété, conditions..." />
 
@@ -250,6 +272,9 @@ function Annonces({ onRetour }) {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
             {annoncesFiltrees.map(a => (
               <div key={a.id} style={{ background: 'white', borderRadius: '12px', padding: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', border: '1px solid #E8F5E9' }}>
+                {a.photo_url && (
+                  <img src={a.photo_url} alt={a.produit} style={{ width: '100%', height: '160px', objectFit: 'cover', borderRadius: '8px', marginBottom: '1rem' }} />
+                )}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
                   <h3 style={{ color: '#1B5E20', margin: 0, fontSize: '1.2rem' }}>{a.produit}</h3>
                   <span style={{ background: '#E8F5E9', color: '#1B5E20', padding: '0.2rem 0.6rem', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 'bold' }}>
@@ -259,24 +284,14 @@ function Annonces({ onRetour }) {
                 <div style={{ color: '#E65100', fontSize: '1.3rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>
                   {parseInt(a.prix).toLocaleString()} GNF/{a.unite}
                 </div>
-                <div style={{ color: '#555', fontSize: '0.9rem', marginBottom: '0.5rem' }}>
-                  📦 {a.quantite} {a.unite} disponibles
-                </div>
-                <div style={{ color: '#555', fontSize: '0.9rem', marginBottom: '0.5rem' }}>
-                  📍 {a.region} {a.prefecture ? `— ${a.prefecture}` : ''}
-                </div>
-                <div style={{ color: '#555', fontSize: '0.9rem', marginBottom: '0.5rem' }}>
-                  🏷️ {a.type_vente}
-                </div>
+                <div style={{ color: '#555', fontSize: '0.9rem', marginBottom: '0.5rem' }}>📦 {a.quantite} {a.unite} disponibles</div>
+                <div style={{ color: '#555', fontSize: '0.9rem', marginBottom: '0.5rem' }}>📍 {a.region} {a.prefecture ? `— ${a.prefecture}` : ''}</div>
+                <div style={{ color: '#555', fontSize: '0.9rem', marginBottom: '0.5rem' }}>🏷️ {a.type_vente}</div>
                 {a.description && (
-                  <div style={{ color: '#777', fontSize: '0.85rem', marginBottom: '1rem', fontStyle: 'italic' }}>
-                    {a.description}
-                  </div>
+                  <div style={{ color: '#777', fontSize: '0.85rem', marginBottom: '1rem', fontStyle: 'italic' }}>{a.description}</div>
                 )}
                 <div style={{ borderTop: '1px solid #E8F5E9', paddingTop: '1rem', marginTop: '1rem' }}>
-                  <div style={{ fontWeight: 'bold', color: '#1B5E20', marginBottom: '0.5rem' }}>
-                    👤 {a.nom_vendeur}
-                  </div>
+                  <div style={{ fontWeight: 'bold', color: '#1B5E20', marginBottom: '0.5rem' }}>👤 {a.nom_vendeur}</div>
                   <div style={{ display: 'flex', gap: '0.5rem' }}>
                     <a href={`tel:${a.telephone}`}
                       style={{ flex: 1, background: '#E8F5E9', color: '#1B5E20', padding: '0.5rem', borderRadius: '6px', textDecoration: 'none', textAlign: 'center', fontSize: '0.85rem', fontWeight: 'bold' }}>
