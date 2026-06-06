@@ -1,0 +1,19 @@
+{
+  "name": "Guinea Agri Market",
+  "short_name": "Agri Market",
+  "description": "La première plateforme agricole numérique de Guinée",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1B5E20",
+  "theme_color": "#1B5E20",
+  "orientation": "portrait",
+  "lang": "fr",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
