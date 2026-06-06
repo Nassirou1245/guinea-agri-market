@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { supabase } from './supabase'
 import Inscription from './Inscription'
 import Dashboard from './Dashboard'
 import Annonces from './Annonces'
@@ -68,6 +69,11 @@ function App() {
     { numero: '3', titre: 'Vendez au meilleur prix', description: 'Négociez directement sans intermédiaire et recevez votre paiement en toute sécurité.', emoji: '💰' },
   ]
 
+  const seDeconnecter = async () => {
+    await supabase.auth.signOut()
+    setUtilisateur(null)
+  }
+
   if (page === 'connexion') return <Connexion onConnecte={(user) => { setUtilisateur(user); setPage('accueil') }} onRetour={() => setPage('accueil')} />
   if (page === 'inscription') return <Inscription onRetour={() => setPage('accueil')} />
   if (page === 'dashboard') return <Dashboard onRetour={() => setPage('accueil')} />
@@ -78,13 +84,19 @@ function App() {
 
       <header style={{ background: '#1B5E20', padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h1 style={{ color: 'white', margin: 0, fontSize: '1.5rem' }}>🌿 GUINEA AGRI MARKET</h1>
-        <nav style={{ display: 'flex', alignItems: 'center' }}>
+        <nav style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
           <a href="#" style={{ color: 'white', marginLeft: '1rem', textDecoration: 'none' }}>Accueil</a>
           <a href="#" onClick={() => setPage('annonces')} style={{ color: 'white', marginLeft: '1rem', textDecoration: 'none', cursor: 'pointer' }}>Produits</a>
           <a href="#" onClick={() => setPage('inscription')} style={{ color: 'white', marginLeft: '1rem', textDecoration: 'none', cursor: 'pointer' }}>Agriculteurs</a>
           <a href="#" onClick={() => setPage('dashboard')} style={{ color: '#A5D6A7', marginLeft: '1rem', textDecoration: 'none', cursor: 'pointer' }}>🔐 Admin</a>
           {utilisateur ? (
-            <span style={{ color: '#A5D6A7', marginLeft: '1rem', fontSize: '0.9rem' }}>👤 {utilisateur.email}</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginLeft: '1rem' }}>
+              <span style={{ color: '#A5D6A7', fontSize: '0.85rem' }}>👤 {utilisateur.email}</span>
+              <button onClick={seDeconnecter}
+                style={{ background: '#E53935', color: 'white', border: 'none', padding: '0.3rem 0.8rem', borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem' }}>
+                Déconnexion
+              </button>
+            </span>
           ) : (
             <a href="#" onClick={() => setPage('connexion')} style={{ color: 'white', marginLeft: '1rem', textDecoration: 'none', cursor: 'pointer', background: '#2E7D32', padding: '0.3rem 0.8rem', borderRadius: '6px' }}>🔐 Connexion</a>
           )}
