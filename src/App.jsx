@@ -5,6 +5,7 @@ import Inscription from './Inscription'
 import Dashboard from './Dashboard'
 import Annonces from './Annonces'
 import Connexion from './Connexion'
+import Prix from './Prix'
 
 function App() {
   const [page, setPage] = useState('accueil')
@@ -82,16 +83,14 @@ function App() {
   if (page === 'inscription') return <Inscription onRetour={() => setPage('accueil')} />
   if (page === 'dashboard') return <Dashboard onRetour={() => setPage('accueil')} />
   if (page === 'annonces') return <Annonces onRetour={() => setPage('accueil')} />
+  if (page === 'prix') return <Prix onRetour={() => setPage('accueil')} />
 
   return (
     <div style={{ fontFamily: 'Arial', margin: 0 }} dir={t.direction}>
 
-      {/* HEADER */}
       <header style={{ background: '#1B5E20', padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
         <h1 style={{ color: 'white', margin: 0, fontSize: '1.5rem' }}>🌿 GUINEA AGRI MARKET</h1>
         <nav style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
-
-          {/* SÉLECTEUR DE LANGUE */}
           <select
             value={langue}
             onChange={e => setLangue(e.target.value)}
@@ -101,9 +100,9 @@ function App() {
               <option key={code} value={code}>{trad.drapeau} {trad.nom}</option>
             ))}
           </select>
-
           <a href="#" style={{ color: 'white', marginLeft: '0.5rem', textDecoration: 'none' }}>{t.accueil}</a>
           <a href="#" onClick={() => setPage('annonces')} style={{ color: 'white', marginLeft: '0.5rem', textDecoration: 'none', cursor: 'pointer' }}>{t.produits}</a>
+          <a href="#" onClick={() => setPage('prix')} style={{ color: 'white', marginLeft: '0.5rem', textDecoration: 'none', cursor: 'pointer' }}>📊 Prix</a>
           <a href="#" onClick={() => setPage('inscription')} style={{ color: 'white', marginLeft: '0.5rem', textDecoration: 'none', cursor: 'pointer' }}>{t.agriculteurs}</a>
           <a href="#" onClick={() => setPage('dashboard')} style={{ color: '#A5D6A7', marginLeft: '0.5rem', textDecoration: 'none', cursor: 'pointer' }}>{t.admin}</a>
           {utilisateur ? (
@@ -120,14 +119,9 @@ function App() {
         </nav>
       </header>
 
-      {/* HERO */}
       <section style={{ background: 'linear-gradient(135deg, #1B5E20, #2E7D32)', padding: '5rem 2rem', textAlign: 'center' }}>
-        <h2 style={{ color: 'white', fontSize: '2.8rem', marginBottom: '1rem' }}>
-          {t.titre_hero}
-        </h2>
-        <p style={{ color: '#C8E6C9', fontSize: '1.3rem', maxWidth: '600px', margin: '0 auto 2.5rem' }}>
-          {t.slogan}
-        </p>
+        <h2 style={{ color: 'white', fontSize: '2.8rem', marginBottom: '1rem' }}>{t.titre_hero}</h2>
+        <p style={{ color: '#C8E6C9', fontSize: '1.3rem', maxWidth: '600px', margin: '0 auto 2.5rem' }}>{t.slogan}</p>
         <button onClick={() => setPage('inscription')} style={{ background: 'white', color: '#1B5E20', padding: '1rem 2.5rem', borderRadius: '8px', border: 'none', fontSize: '1.1rem', fontWeight: 'bold', cursor: 'pointer', marginRight: '1rem' }}>
           {t.inscrire_agriculteur}
         </button>
@@ -136,7 +130,6 @@ function App() {
         </button>
       </section>
 
-      {/* CHIFFRES */}
       <section style={{ background: '#1B5E20', padding: '2.5rem 2rem' }}>
         <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '2rem', maxWidth: '900px', margin: '0 auto' }}>
           {chiffres.map(c => (
@@ -149,7 +142,6 @@ function App() {
         </div>
       </section>
 
-      {/* COMMENT ÇA MARCHE */}
       <section style={{ padding: '4rem 2rem', background: 'white', textAlign: 'center' }}>
         <h2 style={{ color: '#1B5E20', fontSize: '2rem', marginBottom: '0.5rem' }}>{t.comment_ca_marche}</h2>
         <p style={{ color: '#666', marginBottom: '3rem' }}>{t.simple_gratuit}</p>
@@ -167,7 +159,6 @@ function App() {
         </div>
       </section>
 
-      {/* PRODUITS */}
       <section style={{ padding: '4rem 2rem', background: '#F5F5F5', textAlign: 'center' }}>
         <h2 style={{ color: '#1B5E20', marginBottom: '0.5rem', fontSize: '2rem' }}>{t.nos_produits}</h2>
         <p style={{ color: '#666', marginBottom: '2.5rem' }}>{t.acheter_direct}</p>
@@ -188,7 +179,6 @@ function App() {
         ))}
       </section>
 
-      {/* CTA */}
       <section style={{ background: '#2E7D32', padding: '4rem 2rem', textAlign: 'center' }}>
         <h2 style={{ color: 'white', fontSize: '2rem', marginBottom: '1rem' }}>{t.rejoignez}</h2>
         <p style={{ color: '#C8E6C9', fontSize: '1.1rem', marginBottom: '2rem' }}>{t.attendent}</p>
@@ -197,7 +187,6 @@ function App() {
         </button>
       </section>
 
-      {/* FOOTER */}
       <footer style={{ background: '#1B5E20', color: 'white', textAlign: 'center', padding: '2rem' }}>
         <p style={{ margin: 0 }}>© 2026 Guinea Agri Market — Conakry, Guinée 🇬🇳</p>
         <p style={{ margin: '0.5rem 0 0', color: '#C8E6C9', fontSize: '0.9rem' }}>{t.slogan}</p>
