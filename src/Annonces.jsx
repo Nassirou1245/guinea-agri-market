@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from './supabase'
+import Paiement from './Paiement'
 
 function Annonces({ onRetour }) {
   const [annonces, setAnnonces] = useState([])
@@ -11,6 +12,7 @@ function Annonces({ onRetour }) {
   const [succes, setSucces] = useState(false)
   const [photo, setPhoto] = useState(null)
   const [photoPreview, setPhotoPreview] = useState(null)
+  const [annoncePaiement, setAnnoncePaiement] = useState(null)
 
   const [form, setForm] = useState({
     produit: '', categorie: '', quantite: '', unite: 'kg',
@@ -61,7 +63,7 @@ function Annonces({ onRetour }) {
 
   const uploadPhoto = async (fichier) => {
     const nomFichier = `${Date.now()}-${fichier.name}`
-    const { data, error } = await supabase.storage
+    const { error } = await supabase.storage
       .from('photos-annonces')
       .upload(nomFichier, fichier)
     if (error) return null
@@ -77,24 +79,15 @@ function Annonces({ onRetour }) {
       return
     }
     let photoUrl = null
-    if (photo) {
-      photoUrl = await uploadPhoto(photo)
-    }
+    if (photo) { photoUrl = await uploadPhoto(photo) }
     const { error } = await supabase.from('annonces').insert([{
-      produit: form.produit,
-      categorie: form.categorie,
-      quantite: form.quantite,
-      unite: form.unite,
-      prix: form.prix,
-      description: form.description,
-      region: form.region,
-      prefecture: form.prefecture,
-      telephone: form.telephone,
-      whatsapp: form.whatsapp || form.telephone,
-      nom_vendeur: form.nom_vendeur,
-      type_vente: form.type_vente,
-      statut: 'Disponible',
-      photo_url: photoUrl,
+      produit: form.produit, categorie: form.categorie,
+      quantite: form.quantite, unite: form.unite,
+      prix: form.prix, description: form.description,
+      region: form.region, prefecture: form.prefecture,
+      telephone: form.telephone, whatsapp: form.whatsapp || form.telephone,
+      nom_vendeur: form.nom_vendeur, type_vente: form.type_vente,
+      statut: 'Disponible', photo_url: photoUrl,
     }])
     if (error) {
       alert('Erreur : ' + error.message)
@@ -123,6 +116,10 @@ function Annonces({ onRetour }) {
 
   return (
     <div style={{ fontFamily: 'Arial', margin: 0, background: '#F5F5F5', minHeight: '100vh' }}>
+
+      {annoncePaiement && (
+        <Paiement annonce={annoncePaiement} onFermer={() => setAnnoncePaiement(null)} />
+      )}
 
       <header style={{ background: '#1B5E20', padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h1 style={{ color: 'white', margin: 0, fontSize: '1.5rem' }}>🌿 GUINEA AGRI MARKET</h1>
@@ -237,7 +234,6 @@ function Annonces({ onRetour }) {
       )}
 
       <div style={{ maxWidth: '1100px', margin: '2rem auto', padding: '0 1rem' }}>
-
         <div style={{ background: 'white', padding: '1rem', borderRadius: '12px', marginBottom: '1.5rem', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
           <input placeholder="🔍 Rechercher un produit ou vendeur..."
             value={recherche} onChange={e => setRecherche(e.target.value)}
@@ -292,15 +288,19 @@ function Annonces({ onRetour }) {
                 )}
                 <div style={{ borderTop: '1px solid #E8F5E9', paddingTop: '1rem', marginTop: '1rem' }}>
                   <div style={{ fontWeight: 'bold', color: '#1B5E20', marginBottom: '0.5rem' }}>👤 {a.nom_vendeur}</div>
-                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                     <a href={`tel:${a.telephone}`}
-                      style={{ flex: 1, background: '#E8F5E9', color: '#1B5E20', padding: '0.5rem', borderRadius: '6px', textDecoration: 'none', textAlign: 'center', fontSize: '0.85rem', fontWeight: 'bold' }}>
+                      style={{ flex: 1, background: '#E8F5E9', color: '#1B5E20', padding: '0.5rem', borderRadius: '6px', textDecoration: 'none', textAlign: 'center', fontSize: '0.85rem', fontWeight: 'bold', minWidth: '80px' }}>
                       📞 Appeler
                     </a>
                     <a href={`https://wa.me/${(a.whatsapp || a.telephone).replace(/\s/g, '')}`} target="_blank"
-                      style={{ flex: 2, background: '#25D366', color: 'white', padding: '0.5rem', borderRadius: '6px', textDecoration: 'none', textAlign: 'center', fontSize: '0.85rem', fontWeight: 'bold' }}>
+                      style={{ flex: 2, background: '#25D366', color: 'white', padding: '0.5rem', borderRadius: '6px', textDecoration: 'none', textAlign: 'center', fontSize: '0.85rem', fontWeight: 'bold', minWidth: '100px' }}>
                       📱 WhatsApp
                     </a>
+                    <button onClick={() => setAnnoncePaiement(a)}
+                      style={{ flex: 2, background: '#FF6600', color: 'white', padding: '0.5rem', borderRadius: '6px', border: 'none', textAlign: 'center', fontSize: '0.85rem', fontWeight: 'bold', cursor: 'pointer', minWidth: '80px' }}>
+                      💰 Payer
+                    </button>
                   </div>
                 </div>
               </div>
