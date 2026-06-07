@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { supabase } from './supabase'
+import { traductions } from './traductions'
 import Inscription from './Inscription'
 import Dashboard from './Dashboard'
 import Annonces from './Annonces'
@@ -8,6 +9,9 @@ import Connexion from './Connexion'
 function App() {
   const [page, setPage] = useState('accueil')
   const [utilisateur, setUtilisateur] = useState(null)
+  const [langue, setLangue] = useState('fr')
+
+  const t = traductions[langue]
 
   const categories = [
     {
@@ -57,16 +61,16 @@ function App() {
   ]
 
   const chiffres = [
-    { nombre: '10 000+', label: 'Agriculteurs', emoji: '👨‍🌾' },
-    { nombre: '6', label: 'Régions couvertes', emoji: '🗺️' },
-    { nombre: '16', label: 'Produits agricoles', emoji: '🌾' },
-    { nombre: '500+', label: 'Acheteurs actifs', emoji: '🤝' },
+    { nombre: '10 000+', label: t.agriculteurs_stat, emoji: '👨‍🌾' },
+    { nombre: '6', label: t.regions_stat, emoji: '🗺️' },
+    { nombre: '16', label: t.produits_stat, emoji: '🌾' },
+    { nombre: '500+', label: t.acheteurs_stat, emoji: '🤝' },
   ]
 
   const etapes = [
-    { numero: '1', titre: 'Créez votre profil', description: 'Inscrivez-vous gratuitement et publiez vos récoltes disponibles avec photos et prix.', emoji: '📝' },
-    { numero: '2', titre: 'Connectez-vous', description: 'Les acheteurs vous trouvent et vous contactent directement via WhatsApp ou téléphone.', emoji: '📱' },
-    { numero: '3', titre: 'Vendez au meilleur prix', description: 'Négociez directement sans intermédiaire et recevez votre paiement en toute sécurité.', emoji: '💰' },
+    { numero: '1', titre: t.etape1_titre, description: t.etape1_desc, emoji: '📝' },
+    { numero: '2', titre: t.etape2_titre, description: t.etape2_desc, emoji: '📱' },
+    { numero: '3', titre: t.etape3_titre, description: t.etape3_desc, emoji: '💰' },
   ]
 
   const seDeconnecter = async () => {
@@ -80,44 +84,59 @@ function App() {
   if (page === 'annonces') return <Annonces onRetour={() => setPage('accueil')} />
 
   return (
-    <div style={{ fontFamily: 'Arial', margin: 0 }}>
+    <div style={{ fontFamily: 'Arial', margin: 0 }} dir={t.direction}>
 
-      <header style={{ background: '#1B5E20', padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      {/* HEADER */}
+      <header style={{ background: '#1B5E20', padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
         <h1 style={{ color: 'white', margin: 0, fontSize: '1.5rem' }}>🌿 GUINEA AGRI MARKET</h1>
         <nav style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
-          <a href="#" style={{ color: 'white', marginLeft: '1rem', textDecoration: 'none' }}>Accueil</a>
-          <a href="#" onClick={() => setPage('annonces')} style={{ color: 'white', marginLeft: '1rem', textDecoration: 'none', cursor: 'pointer' }}>Produits</a>
-          <a href="#" onClick={() => setPage('inscription')} style={{ color: 'white', marginLeft: '1rem', textDecoration: 'none', cursor: 'pointer' }}>Agriculteurs</a>
-          <a href="#" onClick={() => setPage('dashboard')} style={{ color: '#A5D6A7', marginLeft: '1rem', textDecoration: 'none', cursor: 'pointer' }}>🔐 Admin</a>
+
+          {/* SÉLECTEUR DE LANGUE */}
+          <select
+            value={langue}
+            onChange={e => setLangue(e.target.value)}
+            style={{ background: '#2E7D32', color: 'white', border: '1px solid #A5D6A7', padding: '0.3rem 0.5rem', borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem' }}
+          >
+            {Object.entries(traductions).map(([code, trad]) => (
+              <option key={code} value={code}>{trad.drapeau} {trad.nom}</option>
+            ))}
+          </select>
+
+          <a href="#" style={{ color: 'white', marginLeft: '0.5rem', textDecoration: 'none' }}>{t.accueil}</a>
+          <a href="#" onClick={() => setPage('annonces')} style={{ color: 'white', marginLeft: '0.5rem', textDecoration: 'none', cursor: 'pointer' }}>{t.produits}</a>
+          <a href="#" onClick={() => setPage('inscription')} style={{ color: 'white', marginLeft: '0.5rem', textDecoration: 'none', cursor: 'pointer' }}>{t.agriculteurs}</a>
+          <a href="#" onClick={() => setPage('dashboard')} style={{ color: '#A5D6A7', marginLeft: '0.5rem', textDecoration: 'none', cursor: 'pointer' }}>{t.admin}</a>
           {utilisateur ? (
-            <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginLeft: '1rem' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginLeft: '0.5rem' }}>
               <span style={{ color: '#A5D6A7', fontSize: '0.85rem' }}>👤 {utilisateur.email}</span>
               <button onClick={seDeconnecter}
                 style={{ background: '#E53935', color: 'white', border: 'none', padding: '0.3rem 0.8rem', borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem' }}>
-                Déconnexion
+                {t.deconnexion}
               </button>
             </span>
           ) : (
-            <a href="#" onClick={() => setPage('connexion')} style={{ color: 'white', marginLeft: '1rem', textDecoration: 'none', cursor: 'pointer', background: '#2E7D32', padding: '0.3rem 0.8rem', borderRadius: '6px' }}>🔐 Connexion</a>
+            <a href="#" onClick={() => setPage('connexion')} style={{ color: 'white', marginLeft: '0.5rem', textDecoration: 'none', cursor: 'pointer', background: '#2E7D32', padding: '0.3rem 0.8rem', borderRadius: '6px' }}>{t.connexion}</a>
           )}
         </nav>
       </header>
 
+      {/* HERO */}
       <section style={{ background: 'linear-gradient(135deg, #1B5E20, #2E7D32)', padding: '5rem 2rem', textAlign: 'center' }}>
         <h2 style={{ color: 'white', fontSize: '2.8rem', marginBottom: '1rem' }}>
-          🌾 La plateforme agricole numérique de Guinée
+          {t.titre_hero}
         </h2>
         <p style={{ color: '#C8E6C9', fontSize: '1.3rem', maxWidth: '600px', margin: '0 auto 2.5rem' }}>
-          Connecter les producteurs, développer l'agriculture, nourrir l'avenir.
+          {t.slogan}
         </p>
         <button onClick={() => setPage('inscription')} style={{ background: 'white', color: '#1B5E20', padding: '1rem 2.5rem', borderRadius: '8px', border: 'none', fontSize: '1.1rem', fontWeight: 'bold', cursor: 'pointer', marginRight: '1rem' }}>
-          S'inscrire comme agriculteur
+          {t.inscrire_agriculteur}
         </button>
         <button onClick={() => setPage('annonces')} style={{ background: 'transparent', color: 'white', padding: '1rem 2.5rem', borderRadius: '8px', border: '2px solid white', fontSize: '1.1rem', fontWeight: 'bold', cursor: 'pointer' }}>
-          Voir les produits
+          {t.voir_produits}
         </button>
       </section>
 
+      {/* CHIFFRES */}
       <section style={{ background: '#1B5E20', padding: '2.5rem 2rem' }}>
         <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '2rem', maxWidth: '900px', margin: '0 auto' }}>
           {chiffres.map(c => (
@@ -130,9 +149,10 @@ function App() {
         </div>
       </section>
 
+      {/* COMMENT ÇA MARCHE */}
       <section style={{ padding: '4rem 2rem', background: 'white', textAlign: 'center' }}>
-        <h2 style={{ color: '#1B5E20', fontSize: '2rem', marginBottom: '0.5rem' }}>Comment ça marche ?</h2>
-        <p style={{ color: '#666', marginBottom: '3rem' }}>Simple, rapide et gratuit pour les agriculteurs</p>
+        <h2 style={{ color: '#1B5E20', fontSize: '2rem', marginBottom: '0.5rem' }}>{t.comment_ca_marche}</h2>
+        <p style={{ color: '#666', marginBottom: '3rem' }}>{t.simple_gratuit}</p>
         <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '2rem', maxWidth: '900px', margin: '0 auto' }}>
           {etapes.map(e => (
             <div key={e.numero} style={{ background: '#F5F5F5', padding: '2rem', borderRadius: '12px', maxWidth: '250px', textAlign: 'center', border: '2px solid #E8F5E9' }}>
@@ -147,9 +167,10 @@ function App() {
         </div>
       </section>
 
+      {/* PRODUITS */}
       <section style={{ padding: '4rem 2rem', background: '#F5F5F5', textAlign: 'center' }}>
-        <h2 style={{ color: '#1B5E20', marginBottom: '0.5rem', fontSize: '2rem' }}>Nos produits agricoles</h2>
-        <p style={{ color: '#666', marginBottom: '2.5rem' }}>Achetez directement auprès des producteurs guinéens</p>
+        <h2 style={{ color: '#1B5E20', marginBottom: '0.5rem', fontSize: '2rem' }}>{t.nos_produits}</h2>
+        <p style={{ color: '#666', marginBottom: '2.5rem' }}>{t.acheter_direct}</p>
         {categories.map(cat => (
           <div key={cat.titre} style={{ marginBottom: '2.5rem' }}>
             <div style={{ display: 'inline-block', background: '#1B5E20', color: 'white', padding: '0.4rem 1.5rem', borderRadius: '20px', marginBottom: '1rem', fontSize: '1rem', fontWeight: 'bold' }}>
@@ -167,23 +188,19 @@ function App() {
         ))}
       </section>
 
+      {/* CTA */}
       <section style={{ background: '#2E7D32', padding: '4rem 2rem', textAlign: 'center' }}>
-        <h2 style={{ color: 'white', fontSize: '2rem', marginBottom: '1rem' }}>
-          🌿 Rejoignez Guinea Agri Market aujourd'hui !
-        </h2>
-        <p style={{ color: '#C8E6C9', fontSize: '1.1rem', marginBottom: '2rem' }}>
-          Plus de 10 000 agriculteurs vous attendent sur la plateforme
-        </p>
+        <h2 style={{ color: 'white', fontSize: '2rem', marginBottom: '1rem' }}>{t.rejoignez}</h2>
+        <p style={{ color: '#C8E6C9', fontSize: '1.1rem', marginBottom: '2rem' }}>{t.attendent}</p>
         <button onClick={() => setPage('inscription')} style={{ background: 'white', color: '#1B5E20', padding: '1rem 3rem', borderRadius: '8px', border: 'none', fontSize: '1.1rem', fontWeight: 'bold', cursor: 'pointer' }}>
-          S'inscrire gratuitement
+          {t.inscrire_gratuit}
         </button>
       </section>
 
+      {/* FOOTER */}
       <footer style={{ background: '#1B5E20', color: 'white', textAlign: 'center', padding: '2rem' }}>
         <p style={{ margin: 0 }}>© 2026 Guinea Agri Market — Conakry, Guinée 🇬🇳</p>
-        <p style={{ margin: '0.5rem 0 0', color: '#C8E6C9', fontSize: '0.9rem' }}>
-          Connecter les producteurs, développer l'agriculture, nourrir l'avenir.
-        </p>
+        <p style={{ margin: '0.5rem 0 0', color: '#C8E6C9', fontSize: '0.9rem' }}>{t.slogan}</p>
       </footer>
     </div>
   )
